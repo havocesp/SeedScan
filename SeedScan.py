@@ -7,7 +7,7 @@ def menu():
 
     """This is the main menu"""
 
-    #Set options
+    #Set options - this may be adapted upon next version
     option1 = " 1. Search File"
     option2 = "2. Search Directory"
 

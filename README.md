@@ -1,8 +1,6 @@
 # SeedScan
 Python program that searches files for partial or full BIP39 recovery seed words.
 
-By Paul Taylor - taylor13220@gmail.com
-
 *****************
 
 TO DO:

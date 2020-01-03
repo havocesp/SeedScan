@@ -1,11 +1,35 @@
 import re
-import string
 import os
 import time
 
+'''
+1. Add file count, result count (partial and full) DONE
+2. Add output to file for results
+3. Test search of BIP39 word list DONE
+4. Add functionality for Excel and WOrd
+5. Tests to include: different word sensitivity, time to search subdirectories containing seed and also free book. 
+'''
+
+'''
+Improvements:
+1. Reports on seed word combinations longer than 24 words.
+2. Added file and result counter
+3. Added error handling for opening files
+4. Added timer
+
+'''
+# Reset the result and file counter
+resultcount = 0
+filecount = 0
+failedfile = 0
+
 def menu():
 
-    """This is the main menu"""
+    global filecount
+    global failedfile
+    global start_time
+    '''
+    #This is the main menu
 
     #Set options - this may be adapted upon next version
     option1 = " 1. Search File"
@@ -54,14 +78,38 @@ def menu():
     else:
         print("\nPlease select a valid option...\n")
         menu()
+'''
+
+    target_path = input("\n\nType Target Path: ")
+    # Check if the path is valid
+    if os.path.exists(target_path):
+        #Start timing the running time of the search
+        start_time = time.time()
+
+        #Open each file in the folder and subdirectories and search for seed words
+        for subdir, dirs, files in os.walk(target_path):
+            for file in files:
+
+                if not file.startswith('.'):  # This prevents opening hidden folders on Mac OS
+                    try:
+                        search_file(os.path.join(subdir, file))
+                        filecount += 1
+                    except Exception as ex:
+                        print("Error reading file",file)
+                        print(ex)
+                        failedfile += 1
+    else:
+        print("\nPath not found, please check and try again.\n")
+        menu()
+
 
 
 def search_file(target):
-
+    #Declare the result counter as a global variable
+    global resultcount
     """This opens a file and searches for potential recovery seeds"""
 
-    print("\nSearching", target, "...")
-    time.sleep(2)
+    print("\n### Searching...", target, "...")
 
     with open(target, "r") as f:
 
@@ -71,7 +119,7 @@ def search_file(target):
         # If the list isn't empty
         if matchword:
             # Add a word to the end of matchword to capture seed words at the end of the file
-            matchword.append("END")
+            matchword.append("SeedEnd")
             # Create an empty list called results
             results = []
             # Iterate through each word in the list of words pulled from the file
@@ -85,6 +133,9 @@ def search_file(target):
                     if len(results) < 4:
                         results.clear()
                     else:
+                        #Increment the result counter
+                        resultcount += 1
+
                         if len(results) < 12:
                             print("\n*** Partial Match Found in ", target, ":\n")
                             print("   ".join(results))
@@ -99,6 +150,10 @@ def search_file(target):
                             results.clear()
                         elif len(results) == 24:
                             print("\n*** 24 Word Recovery Seed Found in ", target, ":\n")
+                            print("   ".join(results))
+                            results.clear()
+                        elif len(results) > 24:
+                            print("\n*** Recovery Seed Found Containing Over 24 Words in ", target, ":\n")
                             print("   ".join(results))
                             results.clear()
 
@@ -118,7 +173,14 @@ with open(wordfile,"r") as f:
 
 menu()
 
+print("\n\n#################")
+print("\n\nSearch complete.")
+print("\n", filecount, " Files searched.")
+print("\n", failedfile, " Files were attempted but caused an error.")
+print("\n", resultcount, " Potential recovery word sets found.")
 
+#Report the time taken to search the specified directory and sub-directories
+print("\n\nSearch performed in %s seconds." % round(time.time() - start_time,2))
 
 
 

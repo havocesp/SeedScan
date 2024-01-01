@@ -13,9 +13,8 @@ def menu():
 
     print(option1,"\n", option2)
 
-    menu_choice = input("\n\nSelect Option: ")
 
-    if menu_choice == "1":
+    if (menu_choice := input("\n\nSelect Option: ")) == "1":
         target_file = input("Enter the filename to search: ")
 
         #Check if the filename is valid
@@ -66,10 +65,9 @@ def search_file(target):
     with open(target, "r") as f:
 
         # Find all words in the file and store in list in lowercase
-        matchword = re.findall("[a-z]+", f.read().lower())
 
         # If the list isn't empty
-        if matchword:
+        if matchword := re.findall("[a-z]+", f.read().lower()):
             # Add a word to the end of matchword to capture seed words at the end of the file
             matchword.append("END")
             # Create an empty list called results
